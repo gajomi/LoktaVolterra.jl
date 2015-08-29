@@ -7,6 +7,7 @@ rate(Z::AbstractLotkaVolterraSystem,x::Vector{Float64}) = x.*specificrate(Z)
 jacobian(Z::AbstractLotkaVolterraSystem,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*ommunitymatrix(Z)
 
 #sector based fixed points should be defined as well
+hasfixedpoint(Z::AbstractLotkaVolterraSystem) = "checks for well conditioend linear solver problem"
 fixedpoint(Z::AbstractLotkaVolterraSystem) = -communitymatrix(Z)\intrinsicrate(Z)
 
 isfeasible(Z::AbstractLotkaVolterraSystem) = allpositive(fixed_point(Z))

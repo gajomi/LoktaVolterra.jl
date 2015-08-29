@@ -1,19 +1,19 @@
-#systems parameterized inthe standard "generalized" form
-type LotkaVolterraSystem{S<:AbstractVector{Float64},T<:AbstractMatrix{Float64}} <: AbstractLotkaVolterraSystem
-    N::Int64
-    r::S
-    A::T
-    function LotkaVolterraSystem{S,T}(N::Int64,r::S,A::T)
-        (N==length(r)) & (size(A)==(N,N)) ? new(N,r,A) : error("dimension mismatch")
+#systems parameterized in the standard "generalized" form
+type GeneralizedLotkaVolterra{S<:AbstractVector{Float64},T<:AbstractMatrix{Float64}} <: AbstractLotkaVolterra
+  r::S
+  A::T
+  function GeneralizedLotkaVolterra{S,T}(r::S,A::T)
+      size(A,1) == size(A,2) == length(r) ? new(r,A) : error("dimension mismatch")
     end
 end
-function LotkaVolterraSystem(r::AbstractVector{Float64},A::AbstractMatrix{Float64})
-    LotkaVolterraSystem{typeof(r),typeof(A)}(length(r),r,A)
+function GeneralizedLotkaVolterra(r::AbstractVector{Float64},A::AbstractMatrix{Float64})
+    GeneralizedLotkaVolterra{typeof(r),typeof(A)}(r,A)
 end
-function LotkaVolterraSystem(A::AbstractMatrix{Float64})
+function GeneralizedLotkaVolterra(A::AbstractMatrix{Float64})
     N = size(A)[1]
-    LotkaVolterraSystem(ones(N),A)
+    GeneralizedLotkaVolterra(ones(N),A)
 end
 
-communitymatrix(Z::LotkaVolterraSystem) = Z.A
-intrinsicrate(Z::LotkaVolterraSystem) = Z.r
+nspecies(Z::GeneralizedLotkaVolterra) = length(Z.r)
+communitymatrix(Z::GeneralizedLotkaVolterra) = Z.A
+intrinsicrate(Z::GeneralizedLotkaVolterra) = Z.r

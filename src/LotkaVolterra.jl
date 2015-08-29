@@ -4,7 +4,7 @@ using ODE
 
 import Base.show
 
-export AbstractLotkaVolterraSystem,LotkaVolterraSystem,
+export AbstractLotkaVolterra,GeneralizedLotkaVolterra,
        rate,specificrate,jacobian,
        fixedpoint,
        isfeasible,isstable,feasibility,stability,viability,
