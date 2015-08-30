@@ -11,9 +11,6 @@ nspecies(Z::LogisticGrowth) = 1
 specificrate(Z::LogisticGrowth,x::Real) = Z.r*(1-x/Z.k)
 rate(Z::AbstractLotkaVolterraSystem,x::Real) = x.*specificrate(Z)
 
-#there are only two sectors for LogisticGrowth (this should probably be moved to abstract)
-issector(Z::LogisticGrowth,sector::Vector{Int64}) = sector == [] || sector == [1]
-
 #existence and evaluation of fixed points
 somefixedpoint(Z::LogisticGrowth) = true
 hasfixedpoint(Z::LogisticGrowth) = true
