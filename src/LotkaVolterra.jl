@@ -1,5 +1,6 @@
 module LotkaVolterra
 
+using Iterators
 using ODE
 
 import Base.show

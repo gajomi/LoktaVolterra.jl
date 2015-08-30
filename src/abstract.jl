@@ -7,6 +7,7 @@ rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z)
 jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*ommunitymatrix(Z)
 
 #sector check function
+sectors(Z::AbstractLotkaVolterra) = subsets(1:nspecies(Z))
 function issector(Z::AbstractLotkaVolterra,sector::Vector{Int64})
   N = length(sector)
   usector = unique(sector)
