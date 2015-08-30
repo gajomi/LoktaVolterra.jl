@@ -25,6 +25,15 @@ function fixedpoint(Z::LogisticGrowth,sector::Vector{Int64})
   end
 end
 fixedpoints(Z::LogisticGrowth) = [0.,fixedpoint(Z::LogisticGrowth)]
+function fixedpoints(Z::LogisticGrowth,kind::Symbol)
+  if kind == :feasible
+    return [Z.K]
+  elseif kind == :stable
+    return isstable(Z::LogisticGrowth) ? [Z.K] : [0.]
+  elseif kind == :viable
+    return isstable(Z::LogisticGrowth) ? [Z.K] : []
+  end
+end
 
 #feasibility, stability
 somefeasible(Z::LogisticGrowth) = true
@@ -43,7 +52,7 @@ function isstable(Z::LogisticGrowth,sector::Vector{Int64})
   if !issector(Z,sector)
     error("Not a valid sector for LogististiGrowth fixed point")
   else
-    return sector == [] $ Z.r > 0
+    return (sector == []) $ Z.r > 0
   end
 end
 
