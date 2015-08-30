@@ -10,7 +10,7 @@ jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))
 function issector(Z::AbstractLotkaVolterra,sector::Vector{Int64})
   N = length(sector)
   usector = unique(sector)
-  return length(usector) == N && all(0.< usector .< nspecies(Z))
+  return length(usector) == N && all(0.< usector .<= nspecies(Z))
 end
 
 #sector based fixed points should be defined as well
