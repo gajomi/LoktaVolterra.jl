@@ -14,8 +14,8 @@ rate(Z::LogisticGrowth,x::Real) = x*specificrate(Z)
 
 #existence and evaluation of fixed points
 somefixedpoint(Z::LogisticGrowth) = true
-hasfixedpoint(Z::LogisticGrowth) = true
-hasfixedpoint(Z::LogisticGrowth,sector::Vector{Int64}) = issector(Z,sector)
+isfixedpoint(Z::LogisticGrowth) = true
+isfixedpoint(Z::LogisticGrowth,sector::Vector{Int64}) = issector(Z,sector)
 fixedpoint(Z::LogisticGrowth) = fixedpoint(Z,[1])
 function fixedpoint(Z::LogisticGrowth,sector::Vector{Int64})
   if !issector(Z,sector)
