@@ -19,7 +19,7 @@ isfixedpoint(Z::LogisticGrowth,sector::Vector{Int64}) = issector(Z,sector)
 fixedpoint(Z::LogisticGrowth) = fixedpoint(Z,[1])
 function fixedpoint(Z::LogisticGrowth,sector::Vector{Int64})
   if !issector(Z,sector)
-    error("Not a valid sector for LogististiGrowth fixed point")
+    error("Not a valid sector for Logististic Growth fixed point")
   else
     return sector == [] ? 0. : Z.K
   end
