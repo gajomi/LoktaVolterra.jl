@@ -4,7 +4,8 @@ using ODE
 
 import Base.show
 
-export AbstractLotkaVolterra,GeneralizedLotkaVolterra,
+export AbstractLotkaVolterra,
+       LogisticGrowth,GeneralizedLotkaVolterra,
        rate,specificrate,jacobian,
        fixedpoint,
        isfeasible,isstable,feasibility,stability,viability,
@@ -12,6 +13,7 @@ export AbstractLotkaVolterra,GeneralizedLotkaVolterra,
 
 include("utils.jl")
 include("abstract.jl")
+include("logistic.jl")
 include("general.jl")
 
 end
