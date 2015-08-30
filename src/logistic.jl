@@ -46,5 +46,5 @@ function odeint(Z::LogisticGrowth,x0::Real,times)
   K,r = Z.K,Z.r
   ρ = x0/K
   expterm = [exp(-r*t)for t in times]
-  return K*ρ/((1-ρ)*expterm + ρ)
+  return K*ρ./((1-ρ)*expterm + ρ)
 end
