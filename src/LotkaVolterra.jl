@@ -7,7 +7,7 @@ import Base.show
 export AbstractLotkaVolterra,
        LogisticGrowth,GeneralizedLotkaVolterra,
        rate,specificrate,jacobian,
-       fixedpoint,
+       fixedpoint,fixedpoints,
        isfeasible,isstable,feasibility,stability,viability,
        odeint
 

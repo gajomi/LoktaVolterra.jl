@@ -24,6 +24,7 @@ function fixedpoint(Z::LogisticGrowth,sector::Vector{Int64})
     return sector == [] ? 0. : Z.K
   end
 end
+fixedpoints(Z::LogisticGrowth) = [0.,fixedpoint(Z::LogisticGrowth)]
 
 #feasibility, stability
 isfeasible(Z::LogisticGrowth) =
