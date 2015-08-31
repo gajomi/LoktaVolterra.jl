@@ -5,6 +5,13 @@ specificrate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = intrinsicrate(Z)+com
 rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z)
 
 jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*ommunitymatrix(Z)
+jacobian(Z::AbstractLotkaVolterra) = Diagonal(fixedpoint(Z))*communitymatrix(Z)
+function jacobian(Z::AbstractLotkaVolterra,sector::Vector{Int64})
+    diagterm = intrinsicrate(Z)
+    diagterm[sector] = 0.
+    squareterm = Diagonal(fixedpoint(Z,sector))*communitymatrix(Z)
+    return Diagonal(diagterm) + squareterm
+end
 
 #sector check and generation functions
 sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets([1:nspecies(Z)],dim)
