@@ -60,7 +60,7 @@ function fixedpoint(Z::AbstractLotkaVolterra,sector::Vector{Int64})
     return x
 end
 fixedpoints(Z::AbstractLotkaVolterra) = imap(sector->fixedpoint(Z,sector),sectors(Z))
-
+fixedpoints(Z::AbstractLotkaVolterra,kind::Symbol) = imap(sector->fixedpoint(Z,sector),sectors(Z,kind))
 
 isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = allpositive(fixedpoint(Z,sector)[sector])
 isfeasible(Z::AbstractLotkaVolterra) = allpositive(fixedpoint(Z))
