@@ -7,7 +7,7 @@ rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z)
 jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*ommunitymatrix(Z)
 jacobian(Z::AbstractLotkaVolterra) = Diagonal(fixedpoint(Z))*communitymatrix(Z)
 function jacobian(Z::AbstractLotkaVolterra,sector::Vector{Int64})
-    diagterm = intrinsicrate(Z)
+    diagterm = copy(intrinsicrate(Z))
     diagterm[sector] = 0.
     squareterm = Diagonal(fixedpoint(Z,sector))*communitymatrix(Z)
     return Diagonal(diagterm) + squareterm
@@ -16,6 +16,18 @@ end
 #sector check and generation functions
 sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets([1:nspecies(Z)],dim)
 sectors(Z::AbstractLotkaVolterra) = chain([sectors(Z,dim) for dim = 1:nspecies(Z)]...)
+function sectors(Z::AbstractLotkaVolterra,kind::Symbol)
+  allsectors = sectors(Z)
+  @match kind begin
+    :feasible => filter(sector->isfeasible(Z,sector),allsectors)
+    :infeasible => filter(sector->!isfeasible(Z,sector),allsectors)
+    :stable => filter(sector->isstable(Z,sector),allsectors)
+    :unstable => filter(sector->!isstable(Z,sector),allsectors)
+    :viable => filter(sector->isviable(Z,sector),allsectors)
+    :unviable => filter(sector->!isviable(Z,sector),allsectors)
+    _ => error("not a valid sector filter kind")
+  end
+end
 function issector(Z::AbstractLotkaVolterra,sector::Vector{Int64})
   N = length(sector)
   usector = unique(sector)
@@ -49,18 +61,19 @@ function fixedpoint(Z::AbstractLotkaVolterra,sector::Vector{Int64})
 end
 fixedpoints(Z::AbstractLotkaVolterra) = imap(sector->fixedpoint(Z,sector),sectors(Z))
 
-isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = allpositive(fixed_point(Z,sector)[sector])
-isfeasible(Z::AbstractLotkaVolterra) = allpositive(fixed_point(Z))
+
+isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = allpositive(fixedpoint(Z,sector)[sector])
+isfeasible(Z::AbstractLotkaVolterra) = allpositive(fixedpoint(Z))
+
+isstable(Z::AbstractLotkaVolterra) = real(eigmaxreal(jacobian(Z))) < 0.
+isstable(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = real(eigmaxreal(jacobian(Z,sector))) < 0
+
+isviable(Z::AbstractLotkaVolterra) = isfeasible(Z) & isstable(Z)
+isviable(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = isfeasible(Z,sector) & isstable(Z,sector)
+
 feasibility(Z::AbstractLotkaVolterra) = isfeasible(Z)? 1 : 0
-
-isstable(Z::AbstractLotkaVolterra,x_fp::Vector{Float64}) = real(eigmaxreal(jacobian(Z,x_fp))) < 0
-stability(Z::AbstractLotkaVolterra,x_fp::Vector{Float64}) = isstable(Z,x_fp) < 0 ? 1 : 0
-
-isviable(Z::AbstractLotkaVolterra) =
-function viability(Z::AbstractLotkaVolterra)
-    x = fixedpoint(Z)
-    return allpositive(x) & isstable(Z,x) ? 1 : 0
-end
+stability(Z::AbstractLotkaVolterra) = isstable(Z) < 0 ? 1 : 0
+viability(Z::AbstractLotkaVolterra) = isviable(Z) ? 1 : 0
 
 function odeint(Z::AbstractLotkaVolterra,x0::Vector{Float64},times)
     f(t::Float64,x::Vector{Float64}) = rate(Z,x)
