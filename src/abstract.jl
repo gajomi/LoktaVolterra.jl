@@ -2,9 +2,9 @@ abstract AbstractLotkaVolterra
 
 #abstract
 specificrate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = intrinsicrate(Z)+communitymatrix(Z)*x
-rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z)
+rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z,x)
 
-jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*ommunitymatrix(Z)
+jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*communitymatrix(Z)
 jacobian(Z::AbstractLotkaVolterra) = Diagonal(fixedpoint(Z))*communitymatrix(Z)
 function jacobian(Z::AbstractLotkaVolterra,sector::Vector{Int64})
     diagterm = copy(intrinsicrate(Z))
@@ -17,7 +17,7 @@ end
 sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets([1:nspecies(Z)],dim)
 sectors(Z::AbstractLotkaVolterra) = chain(Any[Int64[]],[sectors(Z,dim) for dim = 1:nspecies(Z)]...)
 function sectors(Z::AbstractLotkaVolterra,kind::Symbol)
-  allsectors = sectors(Z)
+  allsectors = filter(sector->isfixedpoint(Z,sector),sectors(Z))#this needs to be pulled out, just here for now
   @match kind begin
     :feasible => filter(sector->isfeasible(Z,sector),allsectors)
     :infeasible => filter(sector->!isfeasible(Z,sector),allsectors)
@@ -59,8 +59,10 @@ function fixedpoint(Z::AbstractLotkaVolterra,sector::Vector{Int64})
     x[sector] = -A\r
     return x
 end
-fixedpoints(Z::AbstractLotkaVolterra) = imap(sector->fixedpoint(Z,sector),sectors(Z))
-fixedpoints(Z::AbstractLotkaVolterra,kind::Symbol) = imap(sector->fixedpoint(Z,sector),sectors(Z,kind))
+fixedpoints(Z::AbstractLotkaVolterra) = imap(sector->fixedpoint(Z,sector),filter(sector->isfixedpoint(Z,sector),sectors(Z)))
+function fixedpoints(Z::AbstractLotkaVolterra,kind::Symbol)
+  return imap(sector->fixedpoint(Z,sector),filter(sector->isfixedpoint(Z,sector),sectors(Z,kind)))
+end
 
 isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = length(sector)>0 && all(fixedpoint(Z,sector)[sector] .> 0.)
 isfeasible(Z::AbstractLotkaVolterra) = all(fixedpoint(Z) .> 0.)
