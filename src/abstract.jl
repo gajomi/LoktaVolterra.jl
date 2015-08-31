@@ -15,7 +15,7 @@ end
 
 #sector check and generation functions
 sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets([1:nspecies(Z)],dim)
-sectors(Z::AbstractLotkaVolterra) = chain([sectors(Z,dim) for dim = 1:nspecies(Z)]...)
+sectors(Z::AbstractLotkaVolterra) = chain(Any[Int64[]],[sectors(Z,dim) for dim = 1:nspecies(Z)]...)
 function sectors(Z::AbstractLotkaVolterra,kind::Symbol)
   allsectors = sectors(Z)
   @match kind begin
@@ -62,11 +62,11 @@ end
 fixedpoints(Z::AbstractLotkaVolterra) = imap(sector->fixedpoint(Z,sector),sectors(Z))
 fixedpoints(Z::AbstractLotkaVolterra,kind::Symbol) = imap(sector->fixedpoint(Z,sector),sectors(Z,kind))
 
-isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = allpositive(fixedpoint(Z,sector)[sector])
-isfeasible(Z::AbstractLotkaVolterra) = allpositive(fixedpoint(Z))
+isfeasible(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = length(sector)>0 && all(fixedpoint(Z,sector)[sector] .> 0.)
+isfeasible(Z::AbstractLotkaVolterra) = all(fixedpoint(Z) .> 0.)
 
 isstable(Z::AbstractLotkaVolterra) = real(eigmaxreal(jacobian(Z))) < 0.
-isstable(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = real(eigmaxreal(jacobian(Z,sector))) < 0
+isstable(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = real(eigmaxreal(jacobian(Z,sector))) < 0.
 
 isviable(Z::AbstractLotkaVolterra) = isfeasible(Z) & isstable(Z)
 isviable(Z::AbstractLotkaVolterra,sector::Vector{Int64}) = isfeasible(Z,sector) & isstable(Z,sector)
