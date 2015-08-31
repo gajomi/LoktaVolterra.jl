@@ -52,7 +52,7 @@ function isstable(Z::LogisticGrowth,sector::Vector{Int64})
   if !issector(Z,sector)
     error("Not a valid sector for LogististiGrowth fixed point")
   else
-    return (sector == []) $ Z.r > 0
+    return (sector == []) $ (Z.r > 0)
   end
 end
 
