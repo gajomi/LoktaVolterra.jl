@@ -7,14 +7,15 @@ rate(Z::AbstractLotkaVolterra,x::Vector{Float64}) = x.*specificrate(Z,x)
 jacobian(Z::AbstractLotkaVolterra,x::Vector{Float64}) = diagm(specificrate(Z,x))+ diagm(x)*communitymatrix(Z)
 jacobian(Z::AbstractLotkaVolterra) = Diagonal(fixedpoint(Z))*communitymatrix(Z)
 function jacobian(Z::AbstractLotkaVolterra,sector::Vector{Int64})
-    diagterm = copy(intrinsicrate(Z))
+    x = fixedpoint(Z,sector)
+    diagterm = specificrate(Z,copy(x))
     diagterm[sector] = 0.
-    squareterm = Diagonal(fixedpoint(Z,sector))*communitymatrix(Z)
+    squareterm = Diagonal(x)*communitymatrix(Z)
     return Diagonal(diagterm) + squareterm
 end
 
 #sector check and generation functions
-sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets([1:nspecies(Z)],dim)
+sectors(Z::AbstractLotkaVolterra,dim::Int64) = subsets(collect(1:nspecies(Z)),dim)
 sectors(Z::AbstractLotkaVolterra) = chain(Any[Int64[]],[sectors(Z,dim) for dim = 1:nspecies(Z)]...)
 function sectors(Z::AbstractLotkaVolterra,kind::Symbol)
   allsectors = filter(sector->isfixedpoint(Z,sector),sectors(Z))#this needs to be pulled out, just here for now
